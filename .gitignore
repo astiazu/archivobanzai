@@ -1,3 +1,7 @@
 ﻿venv/
 __pycache__/
 *.pyc
+*.db
+backend/uploads/
+backend/instance/
+.vscode/

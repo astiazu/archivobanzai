@@ -1,0 +1,3 @@
+# archivobanzai/backend/requirements.txt
+flask
+flask-sqlalchemy

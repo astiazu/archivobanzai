@@ -22,6 +22,7 @@
       <a href="#puertas">Puertas</a>
       <a href="#historia">Historia</a>
       <a href="#protagonistas">Protagonistas</a>
+      <a href="#ayer">Ayer y Hoy</a>
       <a href="#radio">Radio</a>
       <a href="#recuerdos">Recuerdos</a>
       <a href="#testimonios">Testimonios</a>
@@ -31,7 +32,7 @@
 
   <main id="inicio">
 
-    <!-- HERO con los dos logos (v0.1) -->
+    <!-- HERO con los dos logos -->
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-copy">
@@ -56,7 +57,7 @@
       <div class="scroll-hint">SCROLL <span>↓</span></div>
     </section>
 
-    <!-- NUEVO: TRES PUERTAS -->
+    <!-- TRES PUERTAS -->
     <section class="section doors" id="puertas">
       <div class="section-label">00 / ENTRADAS</div>
       <h2>Tres puertas. <span>Una leyenda.</span></h2>
@@ -86,7 +87,7 @@
       </div>
     </section>
 
-    <!-- HISTORIA (v0.1 actualizado) -->
+    <!-- HISTORIA -->
     <section class="intro section" id="historia">
       <div class="section-label">01 / LA HISTORIA</div>
       <div class="intro-layout">
@@ -101,7 +102,7 @@
       </div>
     </section>
 
-    <!-- TIMELINE ACTUALIZADO con datos confirmados -->
+    <!-- TIMELINE -->
     <section class="timeline section">
       <div class="section-label">02 / LÍNEA DEL TIEMPO</div>
       <div class="timeline-track">
@@ -138,7 +139,7 @@
       </div>
     </section>
 
-    <!-- NUEVO: HOY + COUNTDOWN -->
+    <!-- HOY + COUNTDOWN -->
     <section class="hoy section" id="hoy">
       <div class="section-label">03 / BANZAI HOY · EL REGRESO</div>
       <div class="hoy-layout">
@@ -164,7 +165,7 @@
       </div>
     </section>
 
-    <!-- NUEVO: PROTAGONISTAS -->
+    <!-- PROTAGONISTAS -->
     <section class="protagonistas section" id="protagonistas">
       <div class="section-label">04 / PROTAGONISTAS</div>
       <h2>Las personas que<br><span>hicieron la leyenda.</span></h2>
@@ -205,7 +206,7 @@
       </div>
     </section>
 
-    <!-- NUEVO: MAPA HISTÓRICO -->
+    <!-- MAPA HISTÓRICO -->
     <section class="mapa section" id="mapa">
       <div class="section-label">05 / MAPA HISTÓRICO</div>
       <div class="mapa-head">
@@ -230,50 +231,57 @@
       </div>
     </section>
 
-    <!-- RADIO (v0.1) -->
+    <!-- NUEVO: AYER Y HOY (línea de tiempo dinámica) -->
+    <section class="ayer section" id="ayer">
+      <div class="section-label">06 / AYER Y HOY</div>
+      <h2>La línea de tiempo <span>viva.</span></h2>
+      <p class="section-intro">Todo lo aprobado por el equipo, ordenado por año: videos de aquella época y actuales, fotos y sonidos. Tocá un año y mirá.</p>
+      <div class="year-slider" id="yearSlider"></div>
+      <div class="ayer-viewer" id="ayerViewer">
+        <p class="muted">Elegí un año para ver el material de esa época.</p>
+      </div>
+    </section>
+
+    <!-- RADIO V2 (conectada al backend) -->
     <section class="radio section" id="radio">
       <div class="radio-top">
         <div>
-          <div class="section-label">06 / BANZAI RADIO</div>
+          <div class="section-label">07 / BANZAI RADIO</div>
           <h2>La música<br><span>te lleva de vuelta.</span></h2>
         </div>
         <div class="radio-now">
-          <span class="live-dot"></span> RADIO CONCEPTUAL
-          <strong id="nowPlaying">Elegí una época para comenzar</strong>
+          <span class="live-dot"></span> RADIO VIVA
+          <strong id="nowPlaying">Elegí un año de la línea de tiempo</strong>
         </div>
       </div>
 
       <div class="radio-player">
         <div class="disc"><div class="disc-hole"></div></div>
         <div class="player-main">
-          <span class="player-kicker">BANZAI ARCHIVE MIX</span>
-          <h3 id="trackTitle">Seleccioná una playlist</h3>
-          <p id="trackMeta">Las pistas reales se incorporarán en la siguiente etapa.</p>
+          <span class="player-kicker">MEZCLAS PROPIAS · COLA DEL AÑO</span>
+          <h3 id="trackTitle">Seleccioná un año</h3>
+          <p id="trackMeta">Las mezclas de los DJs de la época suenan acá.</p>
           <div class="fake-progress"><span id="progress"></span></div>
           <div class="player-controls">
             <button id="prevBtn" aria-label="Anterior">↶</button>
             <button id="playBtn" class="play" aria-label="Reproducir">▶</button>
             <button id="nextBtn" aria-label="Siguiente">↷</button>
           </div>
+          <label class="picker-label" for="trackPicker">O elegí un tema puntual de esa fecha:</label>
+          <select id="trackPicker" class="track-picker"></select>
         </div>
         <div class="playlist-list" id="playlistList"></div>
       </div>
 
-      <div class="radio-tags">
-        <button data-playlist="70s">70s</button>
-        <button data-playlist="80s">80s</button>
-        <button data-playlist="90s">90s</button>
-        <button data-playlist="2000s">2000s</button>
-        <button data-playlist="rock">Rock</button>
-        <button data-playlist="dance">Dance</button>
-        <button data-playlist="latino">Latinos</button>
-        <button data-playlist="banzai">BanZai Memories</button>
-      </div>
+      <div class="track-grid" id="trackGrid"></div>
+      <div class="embed-panel" id="embedPanel"></div>
+      <div class="embed-now" id="embedNow"></div>
+      <div class="radio-tags" id="yearTags"></div>
     </section>
 
-    <!-- MEMORIES (v0.1) -->
+    <!-- MEMORIES (mosaico asimétrico) -->
     <section class="memories section" id="recuerdos">
-      <div class="section-label">07 / EL ÁLBUM</div>
+      <div class="section-label">08 / EL ÁLBUM</div>
       <div class="memories-head">
         <h2>¿Tenés una foto<br>de <span>BanZai?</span></h2>
         <p>Este mosaico es una maqueta. La versión real va a permitir cargar, moderar y catalogar material enviado por la comunidad.</p>
@@ -283,12 +291,13 @@
         <div class="memory memory-b"><span>VIDEO / 002</span><b>UN VERANO QUE NO SE OLVIDA</b></div>
         <div class="memory memory-c"><span>FLYER / 003</span><b>LA NOCHE EMPEZABA ACÁ</b></div>
         <div class="memory memory-d"><span>TESTIMONIO / 004</span><b>"YO ESTUVE AHÍ"</b></div>
+        <a class="memory memory-e" href="#participa"><span>SUMÁ TU MATERIAL / 005</span><b>¿TU FOTO ACÁ? ↗</b></a>
       </div>
     </section>
 
-    <!-- TESTIMONIOS ACTUALIZADO: dos columnas (doc vs hist) -->
+    <!-- TESTIMONIOS (voces) -->
     <section class="testimonials section" id="testimonios">
-      <div class="section-label">08 / VOCES</div>
+      <div class="section-label">09 / VOCES</div>
       <div class="testimonials-head">
         <h2>La historia<br>la cuentan <span>ellos.</span></h2>
         <p>Separamos lo documentado de las historias que se cuentan. Dos capas distintas: una respaldada por fuentes, la otra hecha de memoria viva.</p>
@@ -320,14 +329,15 @@
       </div>
     </section>
 
-    <!-- PARTICIPÁ (v0.1) -->
+    <!-- PARTICIPÁ -->
     <section class="participate" id="participa">
       <div class="participate-inner">
-        <span class="section-label">09 / PARTICIPÁ</span>
+        <span class="section-label">10 / PARTICIPÁ</span>
         <h2>¿VOS TAMBIÉN<br><em>ESTUVISTE AHÍ?</em></h2>
         <p>Mandanos tu recuerdo. Puede ser una foto, un video, un audio, un flyer, una entrada o simplemente una historia.</p>
         <button class="btn btn-primary big" id="uploadDemo">SUBIR MI RECUERDO <span>↗</span></button>
         <small>Demo frontend · el formulario real y la moderación se conectarán al backend.</small>
+        <small>¿Tenés cuenta de la comunidad o del equipo? <a href="/login" style="color:#d4af37">Ingresá acá</a></small>
       </div>
     </section>
   </main>
@@ -336,15 +346,17 @@
     <div class="footer-brand">BAN<span>ZAI</span></div>
     <p>ARCHIVO BANZAI · MINA CLAVERO / SALDÁN</p>
     <p class="muted">Un proyecto de memoria, música y comunidad. La leyenda vuelve en septiembre de 2026.</p>
+    <p class="muted"><a href="/login" style="color:#8f8b81;text-decoration:underline">Acceso equipo / panel</a></p>
+      <div class="footer-brand">BAN<span>ZAI</span></div>
   </footer>
 
-  <!-- MODAL MEJORADO con autorización legal -->
+  <!-- MODAL con autorización legal -->
   <dialog id="demoDialog">
     <button class="dialog-close" id="closeDialog" aria-label="Cerrar">×</button>
     <span class="section-label">SUMAR AL ARCHIVO</span>
     <h2>Contanos tu recuerdo.</h2>
     <label>Nombre
-      <input type="text" placeholder="¿Cómo te llamabas en aquella época?">
+      <input type="text" placeholder="¿Cómo te llamaban en aquella época? :)">
     </label>
     <label>¿En cuál BanZai estuviste?
       <select>
@@ -378,6 +390,11 @@
     <p id="dialogMessage" class="dialog-message"></p>
   </dialog>
 
+  <dialog id="ayerModal">
+    <button class="dialog-close" id="closeAyer" aria-label="Cerrar">×</button>
+    <div id="ayerModalBody"></div>
+  </dialog>
+  
   <script src="app.js"></script>
 </body>
 </html>

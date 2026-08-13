@@ -1,0 +1,13 @@
+{# <--! archivobanzai/backend/templates/login.html --> #}
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:40px auto">
+<h2>Ingresar</h2>
+<form method="post">
+<label>Usuario</label><input name="username" required>
+<label>Contraseña</label><input name="password" type="password" required>
+<p style="margin-top:14px"><button class="btn gold">Entrar</button></p>
+</form>
+<p class="muted" style="margin-top:14px">¿Sos parte de la comunidad? <a href="{{ url_for('auth.registro') }}">Pedir cuenta</a></p>
+</div>
+{% endblock %}

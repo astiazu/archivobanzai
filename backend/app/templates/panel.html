@@ -1,0 +1,73 @@
+{# <--! archivobanzai/backend/templates/panel.html --> #}
+{% extends "base.html" %}
+{% block content %}
+<h2>Usuarios pendientes de activación</h2>
+<div class="card"><table>
+<tr><th>Usuario</th><th>Email</th><th>Acciones</th></tr>
+{% for u in usuarios %}
+<tr>
+  <td>{{ u.username }}</td>
+  <td>{{ u.email }}</td>
+  <td>
+    <form class="inline" method="post" action="{{ url_for('admin.panel_usuario', id=u.id) }}">
+      <input type="hidden" name="action" value="activar">
+      <button class="btn">Activar</button>
+    </form>
+    <form class="inline" method="post" action="{{ url_for('admin.panel_usuario', id=u.id) }}">
+      <input type="hidden" name="action" value="hacer_editor">
+      <button class="btn">Hacer editor</button>
+    </form>
+    <form class="inline" method="post" action="{{ url_for('admin.panel_usuario', id=u.id) }}">
+      <input type="hidden" name="action" value="hacer_admin">
+      <button class="btn">Hacer admin</button>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="3" class="muted">Sin pendientes.</td></tr>
+{% endfor %}
+</table></div>
+
+<h2>ARCHIVO · pendientes de moderación</h2>
+<div class="card"><table>
+<tr><th>Usuario</th><th>Tipo</th><th>Sede</th><th>Año</th><th>Título</th><th>Archivo</th><th>Acciones</th></tr>
+{% for r in rec_pend %}<tr>
+<td>{{ r.user_id }}</td><td>{{ r.kind }}</td><td>{{ r.sede }}</td><td>{{ r.year }}</td><td>{{ r.title }}</td>
+<td>{% if r.filename %}<a href="{{ url_for('public.servir_upload', carpeta='recuerdos', filename=r.filename) }}" target="_blank">Ver</a>{% endif %}</td>
+<td>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='recuerdo', id=r.id) }}"><input type="hidden" name="action" value="aprobar"><button class="btn">Aprobar</button></form>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='recuerdo', id=r.id) }}"><input type="hidden" name="action" value="rechazar"><button class="btn">Rechazar</button></form>
+  <a class="btn" href="{{ url_for('admin.panel_editar', tipo='recuerdo', id=r.id) }}">Editar</a>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='recuerdo', id=r.id) }}"><input type="hidden" name="action" value="eliminar"><button class="btn">Eliminar</button></form>
+</td></tr>{% else %}<tr><td colspan="7" class="muted">Sin pendientes.</td></tr>{% endfor %}
+</table></div>
+
+<h2>RADIO · pendientes de moderación</h2>
+<div class="card"><table>
+<tr><th>Título</th><th>Artista</th><th>Estilo</th><th>Año</th><th>Fuente</th><th>Acciones</th></tr>
+{% for t in tra_pend %}<tr>
+<td>{{ t.title }}</td><td>{{ t.artist }}</td><td>{{ t.style }}</td><td>{{ t.year }}</td><td>{{ t.source_type }}</td>
+<td>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='track', id=t.id) }}"><input type="hidden" name="action" value="aprobar"><button class="btn">Aprobar</button></form>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='track', id=t.id) }}"><input type="hidden" name="action" value="rechazar"><button class="btn">Rechazar</button></form>
+  <a class="btn" href="{{ url_for('admin.panel_editar', tipo='track', id=t.id) }}">Editar</a>
+  <form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='track', id=t.id) }}"><input type="hidden" name="action" value="eliminar"><button class="btn">Eliminar</button></form>
+</td></tr>{% else %}<tr><td colspan="6" class="muted">Sin pendientes.</td></tr>{% endfor %}
+</table></div>
+
+<h2>Últimos aprobados (archivo)</h2>
+<div class="card"><table>
+<tr><th>Título</th><th>Tipo</th><th>Año</th><th>Estado</th><th>Acciones</th></tr>
+{% for r in aprobados %}<tr><td>{{ r.title }}</td><td>{{ r.kind }}</td><td>{{ r.year }}</td><td><span class="badge b-ok">aprobado</span></td>
+<td><a class="btn" href="{{ url_for('admin.panel_editar', tipo='recuerdo', id=r.id) }}">Editar</a>
+<form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='recuerdo', id=r.id) }}"><input type="hidden" name="action" value="eliminar"><button class="btn">Eliminar</button></form></td></tr>{% else %}<tr><td colspan="5" class="muted">Nada aprobado aún.</td></tr>{% endfor %}
+</table></div>
+
+<h2>Últimos tracks aprobados (radio)</h2>
+<div class="card"><table>
+<tr><th>Título</th><th>Artista</th><th>Estilo</th><th>Acciones</th></tr>
+{% for t in tracks_ok %}<tr><td>{{ t.title }}</td><td>{{ t.artist }}</td><td>{{ t.style }}</td>
+<td><a class="btn" href="{{ url_for('admin.panel_editar', tipo='track', id=t.id) }}">Editar</a>
+<form class="inline" method="post" action="{{ url_for('admin.panel_accion', tipo='track', id=t.id) }}"><input type="hidden" name="action" value="eliminar"><button class="btn">Eliminar</button></form></td></tr>{% else %}<tr><td colspan="4" class="muted">Nada aprobado aún.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{# <--! archivobanzai/backend/templates/editar.html --> #}
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:640px">
+<h2>Editar {{ 'recuerdo' if tipo == 'recuerdo' else 'track' }} #{{ item.id }}</h2>
+<form method="post">
+<div class="grid2">
+  <div><label>Título</label><input name="title" value="{{ item.title or '' }}"></div>
+  <div><label>Año</label><input name="year" value="{{ item.year or '' }}"></div>
+  {% if tipo == 'recuerdo' %}
+  <div><label>Sede</label><input name="sede" value="{{ item.sede or '' }}"></div>
+  {% else %}
+  <div><label>Artista</label><input name="artist" value="{{ item.artist or '' }}"></div>
+  <div><label>Álbum</label><input name="album" value="{{ item.album or '' }}"></div>
+  <div><label>Sello</label><input name="sello" value="{{ item.sello or '' }}"></div>
+  <div><label>Estilo</label><input name="style" value="{{ item.style or '' }}"></div>
+  {% endif %}
+  <div><label>Estado</label>
+    <select name="status">
+      <option value="pendiente" {{ 'selected' if item.status=='pendiente' }}>pendiente</option>
+      <option value="aprobado" {{ 'selected' if item.status=='aprobado' }}>aprobado</option>
+      <option value="rechazado" {{ 'selected' if item.status=='rechazado' }}>rechazado</option>
+    </select></div>
+</div>
+{% if tipo == 'recuerdo' %}<label>Historia</label><textarea name="story">{{ item.story or '' }}</textarea>{% endif %}
+<p style="margin-top:14px"><button class="btn gold">Guardar</button> <a class="btn" href="{{ url_for('admin.panel') }}">Volver</a></p>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{# <--! archivobanzai/backend/templates/subir.html --> #}
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+<h2>Subir al ARCHIVO (fotos, flyers, videos, testimonios)</h2>
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" name="destino" value="archivo">
+<div class="grid2">
+  <div><label>Tipo</label>
+    <select name="kind" id="kindSel">
+      <option value="foto">Fotografía</option>
+      <option value="video">Video</option>
+      <option value="audio">Audio</option>
+      <option value="flyer">Flyer / entrada</option>
+      <option value="historia">Historia escrita</option>
+    </select></div>
+  <div><label>Sede</label>
+    <select name="sede"><option value="mina">Mina Clavero</option><option value="saldan">Saldán</option><option value="ambas">Ambas</option><option value="ns">No estoy seguro</option></select></div>
+  <div><label>Título</label><input name="title"></div>
+  <div><label>Año aprox.</label><input name="year" placeholder="1991"></div>
+</div>
+<label>Historia / descripción</label><textarea name="story"></textarea>
+<div id="videoUrlBox" style="display:none">
+  <label>URL de YouTube (solo si el video YA está subido ahí; dejá vacío para subir tu archivo)</label>
+  <input name="source_url" placeholder="https://youtube.com/...">
+</div>
+<div id="archivoBox">
+  <label>Archivo desde tu computadora</label>
+  <input type="file" name="file" id="archivoInput">
+</div>
+<p style="margin-top:14px"><button class="btn gold">Enviar a moderación</button></p>
+</form>
+</div>
+
+<div class="card">
+<h2>Subir a la RADIO (mezclas propias o embeds)</h2>
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" name="destino" value="radio">
+<div class="grid2">
+  <div><label>Título *</label><input name="title" required></div>
+  <div><label>Artista / cantante</label><input name="artist"></div>
+  <div><label>Álbum / disco</label><input name="album"></div>
+  <div><label>Sello discográfico</label><input name="sello"></div>
+  <div><label>Ritmo / estilo</label><input name="style" placeholder="Italo Disco"></div>
+  <div><label>Año</label><input name="year" placeholder="1986"></div>
+  <div><label>Fuente</label>
+    <select name="source_type" id="fuenteSel">
+      <option value="file">Archivo propio (mezcla con derechos)</option>
+      <option value="youtube">YouTube (embed)</option>
+      <option value="spotify">Spotify (embed)</option>
+    </select></div>
+</div>
+<div id="radioUrlBox" style="display:none">
+  <label>URL de YouTube / Spotify</label>
+  <input name="source_url" placeholder="https://...">
+</div>
+<div id="radioFileBox">
+  <label>Archivo de audio desde tu computadora (mp3, wav, m4a, ogg)</label>
+  <input type="file" name="file">
+</div>
+<p style="margin-top:14px"><button class="btn gold">Enviar a moderación</button></p>
+</form>
+</div>
+
+{% if es_staff %}
+<div class="card">
+<h2>Lista preparada por el equipo (YouTube / Spotify)</h2>
+<form method="post">
+<input type="hidden" name="destino" value="playlist">
+<div class="grid2">
+  <div><label>Título *</label><input name="title" required placeholder="La noche de 1989"></div>
+  <div><label>Año / década</label><input name="year" placeholder="1989 o 1980s"></div>
+  <div><label>Plataforma</label>
+    <select name="source_type"><option value="youtube">YouTube (lista propia)</option><option value="spotify">Spotify (lista propia)</option></select></div>
+</div>
+<label>URL de la lista</label><input name="source_url" placeholder="https://...">
+<label>Descripción</label><input name="description">
+<p style="margin-top:14px"><button class="btn gold">Publicar lista</button></p>
+</form>
+</div>
+{% endif %}
+
+<script>
+/* Mostrar/ocultar campos según lo elegido */
+const kindSel = document.getElementById('kindSel');
+const archivoBox = document.getElementById('archivoBox');
+const videoUrlBox = document.getElementById('videoUrlBox');
+const archivoInput = document.getElementById('archivoInput');
+function syncArchivo(){
+  const k = kindSel.value;
+  if (k === 'historia'){ archivoBox.style.display='none'; videoUrlBox.style.display='none'; archivoInput.value=''; }
+  else if (k === 'video'){ archivoBox.style.display='block'; videoUrlBox.style.display='block'; }
+  else { archivoBox.style.display='block'; videoUrlBox.style.display='none'; }
+}
+kindSel.addEventListener('change', syncArchivo); syncArchivo();
+
+const fuenteSel = document.getElementById('fuenteSel');
+const radioUrlBox = document.getElementById('radioUrlBox');
+const radioFileBox = document.getElementById('radioFileBox');
+function syncRadio(){
+  const f = fuenteSel.value;
+  radioUrlBox.style.display = (f === 'file') ? 'none' : 'block';
+  radioFileBox.style.display = (f === 'file') ? 'block' : 'none';
+}
+fuenteSel.addEventListener('change', syncRadio); syncRadio();
+</script>
+
+{% endblock %}
