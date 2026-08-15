@@ -10,7 +10,7 @@ def file_url(carpeta, filename):
 
 @bp.get('/api/timeline')
 def timeline():
-    """Todo el contenido aprobado, ordenado por año."""
+    """Todo el contenido aprobado, ordenado por año. Incluye uploader en tracks."""
     out = []
     for r in Recuerdo.query.filter_by(status='aprobado').all():
         out.append({'cat': 'archivo', 'tipo': r.kind, 'title': r.title, 'story': r.story, 'sede': r.sede,
@@ -18,13 +18,16 @@ def timeline():
                     'source': r.source_type or ('file' if r.filename else 'texto'),
                     'url': r.source_url, 'file': file_url('recuerdos', r.filename)})
     for t in Track.query.filter_by(status='aprobado').all():
-        out.append({'cat': 'radio', 'tipo': 'track', 'title': t.title, 'artist': t.artist, 'style': t.style,
+        u = db.session.get(User, t.user_id)
+        out.append({'cat': 'radio', 'tipo': 'track', 'id': t.id, 'title': t.title, 'artist': t.artist, 'style': t.style,
                     'year': t.year or t.decade or '',
                     'source': 'file' if t.filename else t.source_type,
-                    'url': t.source_url, 'file': file_url('radio', t.filename)})
+                    'url': t.source_url, 'file': file_url('radio', t.filename),
+                    'uploader': u.username if u else 'Desconocido',
+                    'uploader_id': t.user_id})
     out.sort(key=lambda i: i.get('year') or '9999')
     return jsonify(out)
-
+    
 @bp.get('/api/radio/<year>')
 def radio(year):
     """Tracks + listas preparadas de un año o década, con scores y uploader."""

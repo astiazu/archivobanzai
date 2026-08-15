@@ -1583,3 +1583,60 @@ dialog .btn {
   color: #d4af37;
   margin-top: 8px;
 }
+
+/* ============ LOGOS EN HEADER Y FOOTER ============ */
+.brand-logos { display: flex; align-items: center; gap: 10px; }
+.brand-logos img { height: 34px; width: auto; display: block; }
+.footer-brand {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  font-size: 0;   /* pisa el estilo de texto viejo */
+}
+.footer-brand img { height: 60px; width: auto; }
+
+/* ============ LOGOS EN LAS PUERTAS ============ */
+.door-logo img {
+  height: 60px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Logo inline dentro de puertas */
+.inline-logo-puerta {
+  height: 80px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+/* Logo inline dentro de títulos */
+.inline-logo {
+  height: 150px;          /* ajustalo a gusto */
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+/* Botón de lista de usuario en el ranking */
+.btn-playlist {
+  padding: 6px 14px;
+  font-size: 11px;
+  letter-spacing: .15em;
+  background: #d4af37;
+  color: #0a0a0f;
+  border: none;
+  cursor: pointer;
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.btn-playlist:hover {
+  background: #f4f1ea;
+  transform: translateY(-1px);
+}
+#nowPlaying b { color: #d4af37; }

@@ -1,8 +1,10 @@
 /* ============================================================
-   ARCHIVO BANZAI · app.js v5
-   · Radio arranca cargada + autoplay en primer click
-   · Cambiar de tema NO corta el que suena (modo "listo")
-   · Secciones independientes, votos, ranking, carrusel álbum
+   ARCHIVO BAN ZAI · app.js v6
+   · Radio aleatoria al arrancar
+   · Listas de usuario ("Escuchar")
+   · Secciones independientes (la música no se corta)
+   · Carrusel álbum infinito
+   · Votos, plays, ranking
    ============================================================ */
 
 const API = '';
@@ -32,7 +34,7 @@ function ytThumb(url){
     if (!el('cd-days')) return;
     if (diff < 0){
       const c = el('countdown');
-      if (c) c.innerHTML = '<div style="grid-column:1/-1;font-family:\'Bebas Neue\';font-size:36px;color:#d4af37">¡BanZai volvió!</div>';
+      if (c) c.innerHTML = '<div style="grid-column:1/-1;font-family:\'Bebas Neue\';font-size:36px;color:#d4af37">¡Ban Zai volvió!</div>';
       return;
     }
     el('cd-days').textContent  = pad(Math.floor(diff / 86400000));
@@ -49,6 +51,7 @@ let timeline = [], queue = [], qi = -1, playing = false;
 let currentTrackId = null, pendingTrack = null;
 let yearAyer = null, yearRadio = null;
 let album = [], albumOffset = 0, albumTimer = null;
+let listeningUser = null;
 const audio = new Audio();
 
 function setPlayerMeta(t, kicker){
@@ -90,10 +93,13 @@ async function initTimeline(){
 
   /* Ayer y Hoy: primer año con material */
   const firstAyer = hasAlways ? 'siempre' : years[0];
-  /* Radio: primer año que TENGA tracks (no cualquier año) */
-  const trackYears = [...new Set(timeline.filter(i => i.tipo === 'track').map(i => i.year || 'siempre'))].sort();
-  const firstRadio = trackYears[0] || firstAyer;
   if (firstAyer) selectYearAyer(firstAyer);
+
+  /* Radio: AÑO ALEATORIO entre los que tienen tracks */
+  const trackYears = [...new Set(timeline.filter(i => i.tipo === 'track').map(i => i.year || 'siempre'))].sort();
+  const firstRadio = trackYears.length
+    ? trackYears[Math.floor(Math.random() * trackYears.length)]
+    : firstAyer;
   if (firstRadio) selectYearRadio(firstRadio);
 
   initAlbum();
@@ -164,6 +170,18 @@ if (ayerModal) ayerModal.addEventListener('close', () => { $('#ayerModalBody').i
 
 /* ============ RADIO ============ */
 async function loadRadio(year){
+  /* Si estamos escuchando una lista de usuario, NO sobreescribir la cola */
+  if (listeningUser){
+    const np = $('#nowPlaying');
+    if (np) np.innerHTML = `Escuchando la lista de <b>${listeningUser}</b> <button id="exitUserList" class="btn btn-ghost" style="padding:4px 10px;margin-left:10px;font-size:11px">Volver a la radio por año</button>`;
+    const exit = $('#exitUserList');
+    if (exit) exit.addEventListener('click', () => {
+      listeningUser = null;
+      if (yearRadio) selectYearRadio(yearRadio);
+    });
+    return;
+  }
+
   let data = { tracks: [], playlists: [] };
   try { data = await (await fetch(API + '/api/radio/' + year)).json(); } catch(e){}
 
@@ -222,11 +240,11 @@ async function loadRadio(year){
   ).join('') : '<p class="muted">Sin listas preparadas.</p>';
 
   const np = $('#nowPlaying');
-  if (np) np.textContent = year === 'siempre' ? 'BanZai · Sin año' : 'BanZai ' + year;
+  if (np) np.textContent = year === 'siempre' ? 'Ban Zai · Sin año' : 'Ban Zai ' + year;
 
-  /* ARRANQUE: primer track cargado con título + intento de autoplay */
+  /* ARRANQUE: TRACK ALEATORIO + intento de autoplay */
   if (currentTrackId == null && queue.length){
-    loadTrack(0);
+    loadTrack(Math.floor(Math.random() * queue.length));
     tryAutoplay();
   }
 }
@@ -340,8 +358,21 @@ async function loadRanking(){
     : '<li class="muted">Sin votos todavía. ¡Sé el primero en votar!</li>';
   const tu = $('#topUsers');
   if (tu) tu.innerHTML = d.top_users.length ? d.top_users.map(u =>
-    `<li><div><b>${u.username}</b></div><em>${u.score} 👍 · ${u.tracks} aportes</em></li>`).join('')
+    `<li>
+       <div>
+         <b>${u.username}</b>
+         <span>${u.score} 👍 · ${u.tracks} aportes</span>
+       </div>
+       <button class="btn btn-playlist" data-user="${u.username}">▶ Escuchar</button>
+     </li>`).join('')
     : '<li class="muted">Sin aportes todavía.</li>';
+
+  /* Delegación de click: botón Escuchar de cada usuario */
+  if (tu){
+    tu.querySelectorAll('.btn-playlist').forEach(b => {
+      b.addEventListener('click', () => listenToUser(b.dataset.user));
+    });
+  }
 }
 
 /* ============ ÁLBUM: CARRUSEL INFINITO ============ */
@@ -367,7 +398,7 @@ function renderAlbum(){
     t.style.backgroundSize     = 'cover';
     t.style.backgroundPosition = 'center';
     const b = t.querySelector('b');
-    if (b) b.textContent = (f.title || 'RECUERDO BANZAI').toUpperCase();
+    if (b) b.textContent = (f.title || 'RECUERDO BAN ZAI').toUpperCase();
     const s = t.querySelector('span');
     if (s && i < 4) s.textContent = 'FOTO / ' + String(pos + 1).padStart(3, '0');
   });
@@ -393,6 +424,31 @@ if (sendBtn) sendBtn.addEventListener('click', () => {
   $('#dialogMessage').textContent = '✓ Recibido. En la versión real entra a moderación.';
   setTimeout(() => dialog.close(), 1500);
 });
+
+/* ============ ESCUCHAR LISTA DE USUARIO ============ */
+function listenToUser(username){
+  listeningUser = username;
+  const userTracks = timeline.filter(i => i.tipo === 'track' && i.uploader === username && i.source === 'file');
+  if (!userTracks.length){ alert('Este usuario todavía no tiene mezclas propias.'); return; }
+
+  queue = userTracks;
+  loadTrack(Math.floor(Math.random() * queue.length));
+  play();
+  bumpPlays(queue[qi]);
+
+  /* Mostrar banner "Escuchando a X" */
+  const np = $('#nowPlaying');
+  if (np) np.innerHTML = `Escuchando la lista de <b>${username}</b> <button id="exitUserList" class="btn btn-ghost" style="padding:4px 10px;margin-left:10px;font-size:11px">Volver a la radio por año</button>`;
+  const exit = $('#exitUserList');
+  if (exit) exit.addEventListener('click', () => {
+    listeningUser = null;
+    if (yearRadio) selectYearRadio(yearRadio);
+  });
+
+  renderQueue();
+  /* Scroll suave al player para que el usuario vea que arrancó */
+  $('.radio-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
 /* ============ ARRANQUE ============ */
 initTimeline();
