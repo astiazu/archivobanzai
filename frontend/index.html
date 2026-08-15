@@ -273,18 +273,48 @@
         <div class="playlist-list" id="playlistList"></div>
       </div>
 
+      <!-- ============= Controles de Radio Nuevos ========== -->
+      <div class="radio-controls">
+        <select id="sortBy">
+          <option value="año">Ordenar por año</option>
+          <option value="pulgares">Ordenar por pulgares</option>
+        </select>
+        <select id="filterUser">
+          <option value="">Todos los usuarios</option>
+        </select>
+      </div>
+
       <div class="track-grid" id="trackGrid"></div>
       <div class="embed-panel" id="embedPanel"></div>
       <div class="embed-now" id="embedNow"></div>
+
+      <!-- Comunidad ranking -->
       <div class="radio-tags" id="yearTags"></div>
+            <div class="ranking">
+        <h3>LA COMUNIDAD SUENA</h3>
+        <div class="ranking-grid">
+          <div class="ranking-col">
+            <span class="ranking-label">TOP TRACKS · MÁS VOTADOS</span>
+            <ol id="topTracks"></ol>
+          </div>
+          <div class="ranking-col">
+            <span class="ranking-label">TOP APORTANTES</span>
+            <ol id="topUsers"></ol>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- MEMORIES (mosaico asimétrico) -->
+    <!-- MEMORIAS (mosaico asimétrico + carrusel infinito) -->
     <section class="memories section" id="recuerdos">
       <div class="section-label">08 / EL ÁLBUM</div>
       <div class="memories-head">
         <h2>¿Tenés una foto<br>de <span>BanZai?</span></h2>
-        <p>Este mosaico es una maqueta. La versión real va a permitir cargar, moderar y catalogar material enviado por la comunidad.</p>
+        <p>Las fotos que aprueba el equipo giran en este carrusel infinito. Tocá las flechas para recorrer la historia, o dejalo correr solo.</p>
+        <div class="album-nav">
+          <button id="albumPrev" class="btn" aria-label="Anterior">‹</button>
+          <button id="albumNext" class="btn" aria-label="Siguiente">›</button>
+        </div>
       </div>
       <div class="memory-grid">
         <div class="memory memory-a"><span>FOTO / 001</span><b>¿QUIÉN SE ACUERDA DE ESTA NOCHE?</b></div>
@@ -394,7 +424,7 @@
     <button class="dialog-close" id="closeAyer" aria-label="Cerrar">×</button>
     <div id="ayerModalBody"></div>
   </dialog>
-  
+
   <script src="app.js"></script>
 </body>
 </html>

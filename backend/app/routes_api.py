@@ -1,6 +1,7 @@
-# archivobanzai\backend\app\routes_admin.py
-from flask import Blueprint, jsonify, url_for
-from .models import db, Recuerdo, Track, Playlist
+# archivobanzai\backend\app\routes_api.py
+from flask import Blueprint, jsonify, url_for, request, abort
+from .models import db, Recuerdo, Track, Playlist, User, Vote
+from .helpers import current_user
 
 bp = Blueprint('api', __name__)
 
@@ -9,6 +10,7 @@ def file_url(carpeta, filename):
 
 @bp.get('/api/timeline')
 def timeline():
+    """Todo el contenido aprobado, ordenado por año."""
     out = []
     for r in Recuerdo.query.filter_by(status='aprobado').all():
         out.append({'cat': 'archivo', 'tipo': r.kind, 'title': r.title, 'story': r.story, 'sede': r.sede,
@@ -25,6 +27,7 @@ def timeline():
 
 @bp.get('/api/radio/<year>')
 def radio(year):
+    """Tracks + listas preparadas de un año o década, con scores y uploader."""
     if year == 'siempre':
         tracks = Track.query.filter_by(status='aprobado').filter(
             db.or_(Track.year == '', Track.year == None)).all()
@@ -35,13 +38,25 @@ def radio(year):
             db.or_(Track.year == year, Track.decade == year)).all()
         lists = Playlist.query.filter_by(status='aprobado').filter(
             db.or_(Playlist.year == year, Playlist.decade == year)).all()
+    
+    tracks_data = []
+    for t in tracks:
+        score = sum(v.value for v in Vote.query.filter_by(track_id=t.id).all())
+        uploader = User.query.get(t.user_id)
+        tracks_data.append({
+            'id': t.id, 'title': t.title, 'artist': t.artist, 'style': t.style,
+            'source': 'file' if t.filename else t.source_type, 'url': t.source_url,
+            'file': file_url('radio', t.filename),
+            'score': score, 'plays': t.plays or 0,
+            'uploader': uploader.username if uploader else 'Desconocido',
+            'uploader_id': t.user_id
+        })
+    
     return jsonify({
-        'tracks': [{'id': t.id, 'title': t.title, 'artist': t.artist, 'style': t.style,
-                    'source': 'file' if t.filename else t.source_type, 'url': t.source_url,
-                    'file': file_url('radio', t.filename)} for t in tracks],
+        'tracks': tracks_data,
         'playlists': [{'id': p.id, 'title': p.title, 'source_type': p.source_type,
                        'url': p.source_url, 'description': p.description} for p in lists]})
-                       
+
 @bp.get('/api/recuerdos')
 def recuerdos():
     return jsonify([{'id': r.id, 'kind': r.kind, 'title': r.title, 'story': r.story, 'sede': r.sede,
@@ -54,3 +69,55 @@ def tracks():
                      'style': t.style, 'year': t.year, 'decade': t.decade, 'source_type': t.source_type,
                      'source_url': t.source_url, 'file': file_url('radio', t.filename)}
                     for t in Track.query.filter_by(status='aprobado').all()])
+
+@bp.post('/api/vote/<int:track_id>')
+def vote(track_id):
+    """Votar pulgar arriba (+1) o abajo (-1). Un voto por usuario."""
+    u = current_user()
+    if not u or not u.active:
+        return jsonify({'error': 'Login requerido'}), 401
+    val = request.json.get('value')
+    if val not in (1, -1):
+        return jsonify({'error': 'Valor inválido'}), 400
+    
+    existing = Vote.query.filter_by(user_id=u.id, track_id=track_id).first()
+    if existing:
+        existing.value = val
+    else:
+        db.session.add(Vote(user_id=u.id, track_id=track_id, value=val))
+    db.session.commit()
+    
+    score = sum(v.value for v in Vote.query.filter_by(track_id=track_id).all())
+    return jsonify({'score': score, 'user_vote': val})
+
+@bp.post('/api/play/<int:track_id>')
+def play(track_id):
+    """Incrementar contador de reproducciones."""
+    t = db.session.get(Track, track_id)
+    if t:
+        t.plays = (t.plays or 0) + 1
+        db.session.commit()
+    return jsonify({'plays': t.plays if t else 0})
+
+@bp.get('/api/ranking')
+def ranking():
+    """Top tracks por votos y top aportantes."""
+    tracks = Track.query.filter_by(status='aprobado').all()
+    scores = {t.id: sum(v.value for v in Vote.query.filter_by(track_id=t.id).all()) for t in tracks}
+
+    top_tracks = sorted(tracks, key=lambda t: (scores[t.id], t.plays or 0), reverse=True)[:5]
+
+    user_scores, user_counts = {}, {}
+    for t in tracks:
+        u = db.session.get(User, t.user_id)
+        if not u: continue
+        user_scores[u.username] = user_scores.get(u.username, 0) + scores[t.id]
+        user_counts[u.username] = user_counts.get(u.username, 0) + 1
+    top_users = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    return jsonify({
+        'top_tracks': [{'id': t.id, 'title': t.title, 'artist': t.artist,
+                        'score': scores[t.id], 'plays': t.plays or 0,
+                        'uploader': (db.session.get(User, t.user_id).username if db.session.get(User, t.user_id) else '')}
+                       for t in top_tracks],
+        'top_users': [{'username': u, 'score': s, 'tracks': user_counts[u]} for u, s in top_users]})
