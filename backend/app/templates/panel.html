@@ -1,6 +1,7 @@
 {# <--! archivobanzai/backend/templates/panel.html --> #}
 {% extends "base.html" %}
 {% block content %}
+<p><a class="btn gold" href="{{ url_for('admin_users.usuarios') }}">👥 Gestionar usuarios</a></p>
 <h2>Usuarios pendientes de activación</h2>
 <div class="card"><table>
 <tr><th>Usuario</th><th>Email</th><th>Acciones</th></tr>

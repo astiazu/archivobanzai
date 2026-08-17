@@ -18,10 +18,14 @@ def create_app():
     from .routes_auth import bp as auth_bp
     from .routes_admin import bp as admin_bp
     from .routes_api import bp as api_bp
+    from .admin_users import bp as admin_users_bp
+
+ 
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(admin_users_bp)
 
     @app.after_request
     def cors(resp):

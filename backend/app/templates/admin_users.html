@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 1100px; margin: 30px auto; padding: 0 16px">
+  <h2>👥 Gestión de usuarios</h2>
+  <p class="muted">
+    Total: {{ usuarios|length }} ·
+    Verificados: {{ usuarios|selectattr('email_verified')|list|length }} ·
+    Activos: {{ usuarios|selectattr('active')|list|length }}
+    &nbsp;·&nbsp; <a href="{{ url_for('admin.panel') }}">← Volver al panel</a>
+  </p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for m in messages %}<p style="color:#d4af37">{{ m }}</p>{% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <table style="width:100%; border-collapse:collapse; margin-top:16px; font-size:13px">
+    <tr style="border-bottom:2px solid #222230; text-align:left">
+      <th style="padding:10px">Usuario</th>
+      <th style="padding:10px">Email</th>
+      <th style="padding:10px">WhatsApp</th>
+      <th style="padding:10px">Rol</th>
+      <th style="padding:10px">Estado</th>
+      <th style="padding:10px">Acciones</th>
+    </tr>
+    {% for u in usuarios %}
+    <tr style="border-bottom:1px solid #222230; vertical-align:top">
+      <td style="padding:10px"><b>{{ u.username }}</b><br>
+        <span class="muted" style="font-size:11px">alta: {{ u.created_at.strftime('%d/%m/%Y') if u.created_at else '-' }}</span></td>
+      <td style="padding:10px">{{ u.email }}<br>
+        {% if u.email_verified %}
+          <span style="color:#7ec97e; font-size:11px">✔ verificado</span>
+        {% else %}
+          <span style="color:#e0b13c; font-size:11px">⏳ sin verificar</span>
+          <form method="post" action="{{ url_for('admin_users.reenviar', uid=u.id) }}" style="display:inline">
+            <button class="btn" style="padding:2px 8px; font-size:10px">Reenviar mail</button>
+          </form>
+        {% endif %}
+      </td>
+      <td style="padding:10px">
+        {{ u.whatsapp or '—' }}<br>
+        {% if u.whatsapp %}
+        <a style="color:#7ec97e; font-size:11px" target="_blank"
+           href="https://wa.me/{{ u.whatsapp.replace('+', '') }}">wa.me ↗</a>
+        {% endif %}
+      </td>
+      <td style="padding:10px">{{ u.role }}</td>
+      <td style="padding:10px">
+        {% if u.active %}<span style="color:#7ec97e"> activo</span>
+        {% else %}<span style="color:#e06c75">🔴 suspendido</span>{% endif %}
+      </td>
+      <td style="padding:10px">
+        {% if u.id != admin.id %}
+        <form method="post" action="{{ url_for('admin_users.toggle', uid=u.id) }}" style="display:inline">
+          <button class="btn" style="padding:4px 10px; font-size:11px">
+            {{ 'Suspender' if u.active else 'Activar' }}
+          </button>
+        </form>
+        <form method="post" action="{{ url_for('admin_users.eliminar', uid=u.id) }}" style="display:inline"
+              onsubmit="return confirm('¿Eliminar a {{ u.username }}? Su contenido pasará al admin.');">
+          <button class="btn" style="padding:4px 10px; font-size:11px; color:#e06c75">Eliminar</button>
+        </form>
+        {% else %}
+        <span class="muted" style="font-size:11px">(vos)</span>
+        {% endif %}
+
+        <details style="margin-top:6px">
+          <summary style="cursor:pointer; font-size:11px; color:#d4af37">✏️ Editar</summary>
+          <form method="post" action="{{ url_for('admin_users.editar', uid=u.id) }}" style="margin-top:8px">
+            <label style="font-size:11px">Usuario</label>
+            <input name="username" value="{{ u.username }}" style="width:120px">
+            <label style="font-size:11px">Email</label>
+            <input name="email" value="{{ u.email }}" style="width:180px">
+            <label style="font-size:11px">WhatsApp</label>
+            <input name="whatsapp" value="{{ u.whatsapp or '' }}" style="width:140px">
+            <label style="font-size:11px">Rol</label>
+            <select name="role" style="width:90px">
+              <option value="user"   {% if u.role == 'user' %}selected{% endif %}>user</option>
+              <option value="editor" {% if u.role == 'editor' %}selected{% endif %}>editor</option>
+              <option value="admin"  {% if u.role == 'admin' %}selected{% endif %}>admin</option>
+            </select>
+            <button class="btn gold" style="padding:4px 12px; font-size:11px">Guardar</button>
+          </form>
+        </details>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
