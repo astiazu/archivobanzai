@@ -215,11 +215,12 @@ async function loadRadio(year){
         else showEmbed(t);
       }
       if (v){
+        if (!window.BZ || !window.BZ.logged_in){ showVoteGate(); return; }
         fetch(API + '/api/vote/' + v.dataset.track, {
           method: 'POST', headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ value: +v.dataset.value })
         }).then(r => r.json()).then(d => {
-          if (d.error) return alert(d.error);
+          if (d.error){ showVoteGate(); return; }
           const s = v.closest('.vote-box').querySelector('.score');
           if (s) s.textContent = d.score;
         });
@@ -450,5 +451,19 @@ function listenToUser(username){
   $('.radio-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+/* ============ SESIÓN + GATE DE VOTO ============ */
+window.BZ = { logged_in: false };
+fetch(API + '/api/me').then(r => r.json()).then(d => { window.BZ = d; }).catch(() => {});
+
+function showVoteGate(){
+  if ($('#voteGate')) return;
+  const g = document.createElement('div');
+  g.id = 'voteGate';
+  g.innerHTML = `🔐 <b>Para votar sumate a la comunidad Ban Zai.</b>
+    <a href="/login">Ingresá</a> · <a href="/registro">Creá tu cuenta</a>
+    <button id="gateClose" aria-label="Cerrar">✕</button>`;
+  document.body.appendChild(g);
+  g.querySelector('#gateClose').addEventListener('click', () => g.remove());
+}
 /* ============ ARRANQUE ============ */
 initTimeline();

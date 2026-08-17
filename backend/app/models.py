@@ -1,3 +1,4 @@
+# backend\app\models.py
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,10 +12,13 @@ class User(db.Model):
     username = db.Column(db.String(40), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    whatsapp = db.Column(db.String(20))
+    email_verified = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(64))
     role = db.Column(db.String(10), default='user')
     active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=now_utc)
-
+    
 class Recuerdo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -65,3 +69,7 @@ class Vote(db.Model):
     value = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=now_utc)
     __table_args__ = (db.UniqueConstraint('user_id', 'track_id'),)
+
+# ---------------------
+
+

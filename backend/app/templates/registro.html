@@ -1,14 +1,30 @@
-{# <--! archivobanzai/backend/templates/registro.html --> #}
+<!-- archivobanzai/backend/templates/registro.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="card" style="max-width:420px;margin:40px auto">
-<h2>Pedir cuenta</h2>
-<p class="muted">Un administrador activará tu cuenta para poder subir material.</p>
-<form method="post">
-<label>Usuario</label><input name="username" required>
-<label>Email</label><input name="email" type="email" required>
-<label>Contraseña</label><input name="password" type="password" required>
-<p style="margin-top:14px"><button class="btn gold">Crear cuenta</button></p>
-</form>
+<div class="card" style="max-width: 460px; margin: 40px auto">
+  <h2>Sumate a la comunidad</h2>
+  <p class="muted">
+    Te vamos a mandar un mail con un link de confirmación.
+    Cuando lo toques, tu cuenta queda activa para subir material y votar.
+  </p>
+  <p class="muted" style="background:#1a1628;border:1px solid #222230;padding:10px;font-size:12px;margin-top:10px">
+    ⚠️ El mail de confirmación puede caer en <b>SPAM / Correo no deseado</b>.
+    Revisá esa carpeta si no lo ves en un par de minutos. Y dale a F5 para actualizar
+  </p>
+  <form method="post">
+    <label>Usuario (mín. 3 caracteres)</label>
+    <input name="username" required minlength="3" maxlength="40">
+    <label>Email real (ahí te mandamos la confirmación)</label>
+    <input name="email" type="email" required placeholder="nombre@gmail.com">
+    <label>WhatsApp (con código de área)</label>
+    <input name="whatsapp" type="tel" required placeholder="+54 9 351 555-5555"
+           pattern="[0-9+\-\s()]{10,20}"
+           title="Ej.: +54 9 351 555-5555 — entre 10 y 15 dígitos">
+    <label>Contraseña (mín. 6 caracteres)</label>
+    <input name="password" type="password" required minlength="6">
+    <p style="margin-top: 14px">
+      <button class="btn gold">Crear cuenta</button>
+    </p>
+  </form>
 </div>
 {% endblock %}

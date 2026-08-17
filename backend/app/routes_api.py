@@ -124,3 +124,11 @@ def ranking():
                         'uploader': (db.session.get(User, t.user_id).username if db.session.get(User, t.user_id) else '')}
                        for t in top_tracks],
         'top_users': [{'username': u, 'score': s, 'tracks': user_counts[u]} for u, s in top_users]})
+
+@bp.get('/api/me')
+def me():
+    """Estado de sesión para el sitio público."""
+    u = current_user()
+    if u and u.active:
+        return jsonify({'logged_in': True, 'username': u.username, 'role': u.role})
+    return jsonify({'logged_in': False})

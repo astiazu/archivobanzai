@@ -5,3 +5,8 @@ __pycache__/
 backend/uploads/
 backend/instance/
 .vscode/
+.env
+clavesApi.txt
+
+limpiar_usuarios.py
+tree.py

@@ -1640,3 +1640,14 @@ dialog .btn {
   transform: translateY(-1px);
 }
 #nowPlaying b { color: #d4af37; }
+
+/* ============ GATE DE VOTO ============ */
+#voteGate {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: #d4af37; color: #0a0a0f; padding: 14px 22px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px;
+  display: flex; align-items: center; gap: 10px; z-index: 999;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100% - 40px);
+}
+#voteGate a { color: #0a0a0f; font-weight: 700; text-decoration: underline; }
+#voteGate button { background: none; border: none; font-size: 16px; cursor: pointer; color: #0a0a0f; }
