@@ -1,7 +1,8 @@
 # archivobanzai\backend\app\routes_api.py
 from flask import Blueprint, jsonify, url_for, request, abort
-from .models import db, Recuerdo, Track, Playlist, User, Vote
-from .helpers import current_user
+from .models import db, Recuerdo, Track, Playlist, User, Vote, Listener
+from .helpers import current_user, staff, guardar_file
+from .config import Config
 
 bp = Blueprint('api', __name__)
 
@@ -132,3 +133,80 @@ def me():
     if u and u.active:
         return jsonify({'logged_in': True, 'username': u.username, 'role': u.role})
     return jsonify({'logged_in': False})
+
+@bp.post('/api/recuerdos')
+def api_recuerdos():
+    """Subida real de recuerdos desde el sitio público (requiere sesión)."""
+    u = current_user()
+    if not u or not u.active:
+        return jsonify({'error': 'Tenés que estar logueado para subir material.'}), 401
+
+    kind = request.form.get('kind')
+    if kind not in Config.ALLOWED and kind != 'historia':
+        return jsonify({'error': 'Tipo de recuerdo inválido.'}), 400
+
+    year = (request.form.get('year') or '').strip()
+    if year and not (year.isdigit() and 1950 <= int(year) <= 2026):
+        return jsonify({'error': 'Año inválido (usá uno entre 1950 y 2026).'}), 400
+
+    title = (request.form.get('title') or '').strip()
+    if not title:
+        return jsonify({'error': 'Poné un título al recuerdo.'}), 400
+
+    source_url = request.form.get('source_url')
+    filename, st = None, 'file'
+    if kind == 'video' and (source_url or '').startswith('http'):
+        st = 'youtube'
+    elif kind != 'historia':
+        filename = guardar_file(request.files.get('file'), 'recuerdos', Config.ALLOWED[kind])
+        if not filename:
+            return jsonify({'error': 'Archivo faltante o formato no permitido.'}), 400
+
+    autor = (request.form.get('autor') or '').strip()
+    story = (request.form.get('story') or '').strip()
+    if autor:
+        story = f'Aporte de {autor}. ' + story
+
+    auto = 'aprobado' if staff(u) else 'pendiente'
+    db.session.add(Recuerdo(user_id=u.id, kind=kind, title=title, story=story,
+                            sede=request.form.get('sede'), year=year,
+                            filename=filename, source_type=st, source_url=source_url,
+                            status=auto))
+    db.session.commit()
+    return jsonify({'ok': True, 'status': auto})
+
+@bp.post('/api/listening')
+def listening():
+    """Heartbeat: el navegador avisa que sigue escuchando. Devuelve stats actuales."""
+    import uuid
+    from datetime import datetime, timedelta, timezone
+    sk = request.cookies.get('bz_sid')
+    if not sk:
+        sk = str(uuid.uuid4())
+    now = datetime.now(timezone.utc)
+    tid = request.json.get('track_id') if request.is_json else None
+    u = current_user()
+    db.session.add(Listener(session_key=sk, user_id=(u.id if u else None),
+                            track_id=tid, last_ping=now))
+    # Purgar pings viejos (más de 2 min)
+    cutoff = now - timedelta(seconds=120)
+    Listener.query.filter(Listener.last_ping < cutoff).delete()
+    db.session.commit()
+    # Estadísticas
+    activos = Listener.query.filter(Listener.last_ping > now - timedelta(seconds=60))\
+                             .with_entities(Listener.session_key).distinct().count()
+    comunidad = User.query.filter_by(active=True).count()
+    resp = jsonify({'oyentes': activos, 'comunidad': comunidad})
+    if not request.cookies.get('bz_sid'):
+        resp.set_cookie('bz_sid', sk, max_age=60*60*24*30, httponly=True)
+    return resp
+
+@bp.get('/api/stats')
+def stats():
+    """Stats públicas: oyentes activos + tamaño de la comunidad."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    activos = Listener.query.filter(Listener.last_ping > now - timedelta(seconds=60))\
+                             .with_entities(Listener.session_key).distinct().count()
+    comunidad = User.query.filter_by(active=True).count()
+    return jsonify({'oyentes': activos, 'comunidad': comunidad})

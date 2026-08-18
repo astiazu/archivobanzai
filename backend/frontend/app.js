@@ -416,14 +416,58 @@ function fillVoces(){
   }
 }
 
-/* ============ MODAL DEMO ============ */
+/* ============ MODAL SUBIR RECUERDO (REAL) ============ */
 const uploadBtn = $('#uploadDemo'), dialog = $('#demoDialog');
-if (uploadBtn) uploadBtn.addEventListener('click', () => dialog.showModal());
+if (uploadBtn) uploadBtn.addEventListener('click', () => {
+  if (!window.BZ || !window.BZ.logged_in){
+    showGate('Para subir tu recuerdo primero sumate a la comunidad.');
+    return;
+  }
+  const du = $('#dialogUser');
+  if (du) du.textContent = 'Conectado como ' + window.BZ.username + '. Tu aporte entra a moderación del equipo.';
+  dialog.showModal();
+});
 const closeBtn = $('#closeDialog'); if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
-const sendBtn = $('#sendDemo');
-if (sendBtn) sendBtn.addEventListener('click', () => {
-  $('#dialogMessage').textContent = '✓ Recibido. En la versión real entra a moderación.';
-  setTimeout(() => dialog.close(), 1500);
+
+/* Según el tipo de material, muestra/oculta archivo y URL */
+const kindSelect = $('#kindSelect');
+if (kindSelect) kindSelect.addEventListener('change', () => {
+  const k = kindSelect.value;
+  $('#fileLabel').style.display = (k === 'historia') ? 'none' : '';
+  $('#urlLabel').style.display  = (k === 'video') ? '' : 'none';
+  $('#recuerdoFile').required   = (k !== 'historia' && k !== 'video');
+});
+
+/* Envío real al backend */
+const recuerdoForm = $('#recuerdoForm');
+if (recuerdoForm) recuerdoForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('#dialogMessage');
+  if (!$('#authCheck').checked){ msg.textContent = '⚠️ Debés autorizar la publicación del material.'; return; }
+  const kind = kindSelect.value;
+  const file = $('#recuerdoFile').files[0];
+  const url  = (recuerdoForm.source_url.value || '').trim();
+  if (kind !== 'historia' && kind !== 'video' && !file){ msg.textContent = '⚠️ Adjuntá el archivo (foto, audio o flyer).'; return; }
+  if (kind === 'video' && !file && !url){ msg.textContent = '⚠️ Para video: adjuntá un archivo o pegá una URL de YouTube.'; return; }
+
+  const fd = new FormData(recuerdoForm);
+  if (!file) fd.delete('file');
+  msg.textContent = 'Enviando…';
+  try {
+    const r = await fetch(API + '/api/recuerdos', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.ok){
+      msg.textContent = d.status === 'aprobado'
+        ? '✓ ¡Gracias! Tu recuerdo ya está publicado.'
+        : '✓ ¡Gracias! Tu recuerdo entró a moderación y el equipo lo publica.';
+      recuerdoForm.reset();
+      setTimeout(() => dialog.close(), 2500);
+    } else {
+      msg.textContent = '⚠️ ' + (d.error || 'No se pudo enviar.');
+    }
+  } catch(err){
+    msg.textContent = '⚠️ Error de conexión. Probá de nuevo.';
+  }
 });
 
 /* ============ ESCUCHAR LISTA DE USUARIO ============ */
@@ -455,15 +499,38 @@ function listenToUser(username){
 window.BZ = { logged_in: false };
 fetch(API + '/api/me').then(r => r.json()).then(d => { window.BZ = d; }).catch(() => {});
 
-function showVoteGate(){
+function showGate(msg){
   if ($('#voteGate')) return;
   const g = document.createElement('div');
   g.id = 'voteGate';
-  g.innerHTML = `🔐 <b>Para votar sumate a la comunidad Ban Zai.</b>
+  g.innerHTML = `🔐 <b>${msg}</b>
     <a href="/login">Ingresá</a> · <a href="/registro">Creá tu cuenta</a>
     <button id="gateClose" aria-label="Cerrar">✕</button>`;
   document.body.appendChild(g);
   g.querySelector('#gateClose').addEventListener('click', () => g.remove());
 }
+function showVoteGate(){ showGate('Para votar sumate a la comunidad Ban Zai.'); }
+
+/* ============ OYENTES EN VIVO (heartbeat) ============ */
+function sendHeartbeat(){
+  fetch(API + '/api/listening', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ track_id: currentTrackId }),
+    credentials: 'same-origin'
+  }).then(r => r.json()).then(d => {
+    const o = $('#statOyentes'), c = $('#statComunidad');
+    if (o) o.textContent = d.oyentes;
+    if (c) c.textContent = d.comunidad;
+  }).catch(() => {});
+}
+/* Stats al cargar + heartbeat cada 15s (cuando hay audio) */
+fetch(API + '/api/stats').then(r => r.json()).then(d => {
+  const o = $('#statOyentes'), c = $('#statComunidad');
+  if (o) o.textContent = d.oyentes;
+  if (c) c.textContent = d.comunidad;
+}).catch(() => {});
+setInterval(sendHeartbeat, 15000);
+
 /* ============ ARRANQUE ============ */
 initTimeline();

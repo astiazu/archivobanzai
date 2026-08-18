@@ -1651,3 +1651,23 @@ dialog .btn {
 }
 #voteGate a { color: #0a0a0f; font-weight: 700; text-decoration: underline; }
 #voteGate button { background: none; border: none; font-size: 16px; cursor: pointer; color: #0a0a0f; }
+
+/* ============ LIVE STATS HEADER ============ */
+.live-stats {
+  display: flex; gap: 16px; align-items: center;
+  font-family: 'Space Grotesk', monospace; font-size: 11px;
+  color: #a8a49a; letter-spacing: .05em;
+}
+.live-stats .stat { display: flex; align-items: center; gap: 6px; }
+.live-stats b { color: #f4f1ea; font-weight: 600; }
+.live-stats .dot {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+}
+.live-stats .dot.red  { background: #e06c75; box-shadow: 0 0 8px #e06c75;
+  animation: blink 1.6s infinite; }
+.live-stats .dot.gold { background: #d4af37; box-shadow: 0 0 6px #d4af37; }
+@keyframes blink { 50% { opacity: .4; } }
+
+@media (max-width: 720px) {
+  .live-stats { display: none; }
+}

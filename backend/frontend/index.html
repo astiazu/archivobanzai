@@ -30,6 +30,10 @@
       <a href="#recuerdos">Recuerdos</a>
       <a href="#testimonios">Testimonios</a>
     </nav>
+    <div class="live-stats" id="liveStats">
+      <span class="stat"><span class="dot red"></span><b id="statOyentes">0</b> escuchando</span>
+      <span class="stat"><span class="dot gold"></span><b id="statComunidad">0</b> en la comunidad</span>
+    </div>
     <a class="header-cta" href="#participa">Yo estuve ahí <span>↗</span></a>
   </header>
 
@@ -390,39 +394,51 @@
     <button class="dialog-close" id="closeDialog" aria-label="Cerrar">×</button>
     <span class="section-label">SUMAR AL ARCHIVO</span>
     <h2>Contanos tu recuerdo.</h2>
-    <label>Nombre
-      <input type="text" placeholder="¿Cómo te llamabas en aquella época?">
-    </label>
-    <label>¿En cuál Ban Zai estuviste?
-      <select>
-        <option>Saldán</option>
-        <option>Mina Clavero</option>
-        <option>Ambas</option>
-        <option>No estoy seguro</option>
-      </select>
-    </label>
-    <label>Año aproximado
-      <input type="text" placeholder="Ej.: 1992">
-    </label>
-    <label>¿Qué querés compartir?
-      <select>
-        <option>Fotografía</option>
-        <option>Video</option>
-        <option>Audio / anécdota hablada</option>
-        <option>Flyer o entrada</option>
-        <option>Casete o CD</option>
-        <option>Historia escrita</option>
-      </select>
-    </label>
-    <label>Tu historia
-      <textarea rows="4" placeholder="¿Qué recordás?"></textarea>
-    </label>
-    <label class="check">
-      <input type="checkbox">
-      <span>Autorizo la publicación de este material en Archivo Ban Zai con fines de memoria cultural y confirmo que tengo los derechos sobre lo que comparto.</span>
-    </label>
-    <button class="btn btn-primary" id="sendDemo">ENVIAR (DEMO)</button>
-    <p id="dialogMessage" class="dialog-message"></p>
+    <p class="muted" id="dialogUser"></p>
+    <form id="recuerdoForm">
+      <label>Tu nombre o apodo de la época
+        <input type="text" name="autor" placeholder="¿Cómo te llamaban?">
+      </label>
+      <label>¿En cuál Ban Zai estuviste?
+        <select name="sede">
+          <option value="saldan">Saldán</option>
+          <option value="mina">Mina Clavero</option>
+          <option value="ambas">Ambas</option>
+          <option value="ns">No estoy seguro</option>
+        </select>
+      </label>
+      <label>Año aproximado
+        <input type="text" name="year" placeholder="Ej.: 1992">
+      </label>
+      <label>¿Qué querés compartir?
+        <select name="kind" id="kindSelect">
+          <option value="foto">Fotografía</option>
+          <option value="video">Video</option>
+          <option value="audio">Audio / anécdota hablada</option>
+          <option value="flyer">Flyer o entrada</option>
+          <option value="historia">Historia escrita</option>
+        </select>
+      </label>
+      <label id="fileLabel">Archivo (foto, video, audio o flyer)
+        <input type="file" name="file" id="recuerdoFile"
+               accept=".png,.jpg,.jpeg,.webp,.gif,.mp3,.wav,.m4a,.ogg,.mp4,.mov,.webm,.pdf">
+      </label>
+      <label id="urlLabel" style="display:none">…o URL de YouTube (solo videos)
+        <input type="url" name="source_url" placeholder="https://youtube.com/watch?v=...">
+      </label>
+      <label>Título del recuerdo
+        <input type="text" name="title" required placeholder="Ej.: La noche del 92">
+      </label>
+      <label>Tu historia
+        <textarea name="story" rows="4" placeholder="¿Qué recordás?"></textarea>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="authCheck">
+        <span>Autorizo la publicación de este material en Archivo Ban Zai con fines de memoria cultural y confirmo que tengo los derechos sobre lo que comparto.</span>
+      </label>
+      <button class="btn btn-primary" type="submit">ENVIAR AL ARCHIVO</button>
+      <p id="dialogMessage" class="dialog-message"></p>
+    </form>
   </dialog>
 
   <dialog id="ayerModal">

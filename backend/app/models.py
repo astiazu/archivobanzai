@@ -70,6 +70,13 @@ class Vote(db.Model):
     created_at = db.Column(db.DateTime, default=now_utc)
     __table_args__ = (db.UniqueConstraint('user_id', 'track_id'),)
 
+class Listener(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_key = db.Column(db.String(64), index=True)   # fingerprint del navegador
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    track_id = db.Column(db.Integer)
+    last_ping = db.Column(db.DateTime, default=now_utc, index=True)
+
 # ---------------------
 
 
