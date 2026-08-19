@@ -1,0 +1,34 @@
+<?wpl version="1.0"?>
+<smil>
+    <head>
+        <meta name="Generator" content="Microsoft Windows Media Player -- 11.0.5721.5268"/>
+        <meta name="AverageRating" content="75"/>
+        <meta name="TotalDuration" content="5286"/>
+        <meta name="ItemCount" content="20"/>
+        <title>lentos</title>
+    </head>
+    <body>
+        <seq>
+            <media src="..\Music\Lentos\[alphaville] - forever young.mp3" tid="{9E2D9678-ADF8-45E2-BBE5-6626DF49CEDA}"/>
+            <media src="..\Music\Lentos\[louis amstrong] - what a wonderful world.mp3" tid="{FA5C1AD8-61EA-434C-B54E-B7723FED9927}"/>
+            <media src="..\Music\Lentos\[mariah carey] - without you.mp3" tid="{7ABEC75C-C81D-445A-ADAB-4693D72F78BD}"/>
+            <media src="..\Music\Lentos\[phil collins] - against all odds.mp3" tid="{5ABDCACD-C39B-4E33-BFED-0E3CC3AFC542}"/>
+            <media src="..\Music\Lentos\[phil collins] - one more night.mp3" tid="{071CFD04-63DA-4FA8-9609-2969BD420246}"/>
+            <media src="..\Music\Lentos\[rem] - losing my religion.mp3" tid="{B56AC060-B8B4-497F-8C41-03504A694551}"/>
+            <media src="..\Music\Lentos\[scorpions] - still loving you .mp3" tid="{E3F9FAAB-4F30-49E8-ACB3-25F7C91E875B}"/>
+            <media src="..\Music\Lentos\[simply red] - if you don&apos;t know me by now.mp3" tid="{384B880F-67A7-4806-8047-ECFF5F4BBAF0}"/>
+            <media src="..\Music\Lentos\[sinead o´connor] nothing compares to you.mp3" tid="{AF5D910E-8AAB-4DE1-A8DC-A45644C6F87A}"/>
+            <media src="..\Music\Lentos\[stevie wonder] i just called to say i love you.mp3" tid="{4DA147B6-E07C-4BB4-B824-506E80A601E8}"/>
+            <media src="..\Music\Lentos\[the righteous brothers] - unchained melody.mp3" tid="{BB308307-452A-48FF-A234-3AE856314E88}"/>
+            <media src="..\Music\Lentos\ace of base - living in danger.mp3" tid="{A90712D2-FA11-4B44-8D00-853E4C8F28B4}"/>
+            <media src="..\Music\Lentos\duran duran - ordinary world .mp3" tid="{4A4ACDF1-26CC-4DA6-9FDC-22797397C5CC}"/>
+            <media src="..\Music\Lentos\extreme - more than words.mp3" tid="{8F17059C-FE0B-465F-A4A7-106C7E7C1ED9}"/>
+            <media src="..\Music\Lentos\france gal - ela ela.mp3" tid="{4862EFC0-C47B-4171-8493-F31B1ECB9617}"/>
+            <media src="..\Music\Lentos\george michael - i&apos;m never gonna dance again.mp3" tid="{A5AE1C8C-2C26-4AC0-B198-70162F9617E3}"/>
+            <media src="..\Music\Lentos\the fugees - killing me softly.mp3" tid="{524F7199-A0F8-4436-8B71-5542C3C324BC}"/>
+            <media src="..\Music\Lentos\the police - every breath you take.mp3" cid="{2B4271BB-1C63-431A-89EE-CA97320F8ADA}" tid="{3A13AE7E-18BF-4D74-A882-B982BAE646AC}"/>
+            <media src="..\Music\Lentos\wham! &amp; george michael - careless whispers.mp3" tid="{2E6184DD-12D4-4F69-8F84-F5D263994022}"/>
+            <media src="..\Music\Lentos\when a man loves a woman.mp3" tid="{A2C5ECB1-2701-4578-A2DF-04E7B18F251C}"/>
+        </seq>
+    </body>
+</smil>

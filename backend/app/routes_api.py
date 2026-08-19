@@ -1,6 +1,6 @@
 # archivobanzai\backend\app\routes_api.py
 from flask import Blueprint, jsonify, url_for, request, abort
-from .models import db, Recuerdo, Track, Playlist, User, Vote, Listener
+from .models import db, Recuerdo, Track, Playlist, User, Vote, Listener, Protagonista
 from .helpers import current_user, staff, guardar_file
 from .config import Config
 
@@ -210,3 +210,44 @@ def stats():
                              .with_entities(Listener.session_key).distinct().count()
     comunidad = User.query.filter_by(active=True).count()
     return jsonify({'oyentes': activos, 'comunidad': comunidad})
+
+@bp.get('/api/protagonistas')
+def protagonistas():
+    rows = Protagonista.query.filter_by(status='aprobado').order_by(Protagonista.id).all()
+    return jsonify([{'id': p.id, 'role': p.role, 'name': p.name, 'meta': p.meta,
+                     'text': p.text, 'quote': p.quote, 'source': p.source,
+                     'media_type': p.media_type, 'media_file': p.media_file,
+                     'media_url': p.media_url} for p in rows])
+
+@bp.post('/api/protagonistas')
+def crear_protagonista():
+    u = current_user()
+    if not u or not u.active:
+        return jsonify({'error': 'Tenés que estar logueado y con la cuenta activa.'}), 401
+    name = (request.form.get('name') or '').strip()
+    if not name:
+        return jsonify({'error': 'El nombre es obligatorio.'}), 400
+    media_file, media_type = None, ''
+    media_url = (request.form.get('media_url') or '').strip()
+    f = request.files.get('media')
+    if f and f.filename:
+        ext = f.filename.rsplit('.', 1)[-1].lower()
+        if ext in ('jpg', 'jpeg', 'png', 'webp', 'gif'): media_type = 'foto'
+        elif ext in ('mp4', 'mov', 'webm'): media_type = 'video'
+        elif ext in ('mp3', 'wav', 'm4a', 'ogg'): media_type = 'audio'
+        media_file = guardar_file(f, 'protagonistas',
+                                  ('jpg', 'jpeg', 'png', 'webp', 'gif',
+                                   'mp4', 'mov', 'webm', 'mp3', 'wav', 'm4a', 'ogg'))
+    elif media_url.startswith('http'):
+        media_type = 'video'
+    db.session.add(Protagonista(
+        role=(request.form.get('role') or 'LA GENTE').strip(),
+        name=name,
+        meta=(request.form.get('meta') or '').strip(),
+        text=(request.form.get('text') or '').strip(),
+        quote=(request.form.get('quote') or '').strip(),
+        source='🟡 APORTE DE LA COMUNIDAD',
+        media_type=media_type, media_file=media_file, media_url=media_url,
+        status='pendiente'))
+    db.session.commit()
+    return jsonify({'ok': True})

@@ -1671,3 +1671,143 @@ dialog .btn {
 @media (max-width: 720px) {
   .live-stats { display: none; }
 }
+
+/* ============ CARRUSEL PROTAGONISTAS ============ */
+.carousel-container {
+  position: relative;
+  margin: 30px 0;
+  padding: 0 40px;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+
+.carousel-track .card-protagonista {
+  flex: 0 0 calc(25% - 12px);
+  background: var(--bg-card, #11111a);
+  border: 1px solid var(--line, #222230);
+  padding: 24px 20px;
+  cursor: pointer;
+  transition: border-color .2s, transform .2s;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-track .card-protagonista:hover {
+  border-color: var(--gold, #d4af37);
+  transform: translateY(-2px);
+}
+
+.carousel-track .card-protagonista .role {
+  font-size: 10px;
+  letter-spacing: .15em;
+  color: var(--gold, #d4af37);
+  margin-bottom: 12px;
+}
+
+.carousel-track .card-protagonista h3 {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 22px;
+  color: var(--ink, #f4f1ea);
+  margin-bottom: 8px;
+}
+
+.carousel-track .card-protagonista .meta {
+  font-size: 11px;
+  color: var(--dim, #a8a49a);
+  letter-spacing: .05em;
+  margin-bottom: 16px;
+}
+
+.carousel-track .card-protagonista .quote {
+  font-style: italic;
+  color: var(--ink, #f4f1ea);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: auto;
+  border-top: 1px solid var(--line, #222230);
+  padding-top: 14px;
+}
+
+.carousel-track .card-protagonista .ver-mas {
+  display: block;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--gold, #d4af37);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--line, #222230);
+  background: var(--bg, #0a0a0f);
+  color: var(--ink, #f4f1ea);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, color .2s;
+  z-index: 2;
+}
+.carousel-arrow:hover:not(:disabled) {
+  border-color: var(--gold, #d4af37);
+  color: var(--gold, #d4af37);
+}
+.carousel-arrow:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+.carousel-prev { left: 0; }
+.carousel-next { right: 0; }
+
+/* Diálogo ficha completa */
+#protDialog, #protaFormDialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg, #0a0a0f);
+  color: var(--ink, #f4f1ea);
+  border: 1px solid var(--line, #222230);
+  padding: 32px;
+  max-width: 600px;
+  width: 90vw;
+  z-index: 100;
+}
+
+#protDialog::backdrop {
+  background: rgba(0,0,0,.8);
+}
+#protDialog .dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--ink, #f4f1ea);
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+@media (max-width: 900px) {
+  .carousel-track .card-protagonista { flex: 0 0 calc(50% - 8px); }
+}
+@media (max-width: 600px) {
+  .carousel-track .card-protagonista { flex: 0 0 100%; }
+  .carousel-container { padding: 0 30px; }
+}

@@ -34,9 +34,9 @@ with app.app_context():
         db.session.commit()
         print('>>> Admin inicial creado')
 
-        from app.seed import run_seed
-        run_seed()
+    from app.seed import run_seed
+    run_seed()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=('PORT' not in os.environ))
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=True)

@@ -1,8 +1,32 @@
 import os
 import re
 import shutil
-from .models import db, User, Track, Recuerdo
+from .models import db, User, Track, Recuerdo, Protagonista
 from .config import Config
+
+PROTAGONISTAS = [
+    {'role': 'DJ · SALDÁN', 'name': 'Eduardo Quintana', 'meta': 'BARRIO PUEYRREDÓN · HOY EN ALEMANIA',
+     'text': 'Trabajó como DJ en Ban Zai Saldán. Hoy regentea un restaurante en Alemania, pero recuerda con cariño sus inicios en la disco mítica de Av. Latinoamérica.',
+     'quote': 'Hacía divertir mucho a la gente.', 'source': 'FUENTE · Cadena 3 ↗'},
+    {'role': 'RADIO · MINA CLAVERO', 'name': 'FM 104.9 Rockhola', 'meta': 'GRUPO FUNDADOR · DESDE 1986',
+     'text': 'El mismo grupo que en 1986 hacía locución en la Playa de Ban Zai y armó una radio al aire libre, hoy sostiene FM 104.9 Rockhola y Radio Portneuf Club.',
+     'quote': 'Disfrutando de la magia de la música, de los grandes locutores, nos volvimos adictos a la buena música.', 'source': 'FUENTE · App Rockhola ↗'},
+    {'role': 'DUEÑO · HOY', 'name': 'Quique', 'meta': 'BAN ZAI SHOW · REAPERTURA 2026',
+     'text': 'Detrás del regreso de Ban Zai Mina Clavero en septiembre de 2026. Lidera Ban Zai Show y la reconstrucción de la marca como archivo vivo de la noche cordobesa.',
+     'quote': 'Pronto, un testimonio del propio Quique sobre cómo empezó este regreso.', 'source': ' TESTIMONIO EN CURSO'},
+    {'role': 'LA GENTE', 'name': 'Vos, que estuviste ahí', 'meta': 'CADA NOCHE · CADA VERANO',
+     'text': 'Esta ficha queda vacía a propósito. Porque el archivo se completa con cada foto, cada testimonio, cada recuerdo que nos mandes.',
+     'quote': '¿Estuviste vos? Entonces tu lugar en el archivo está esperándote.', 'source': ''},
+         {'role': 'BARMAN · MINA CLAVERO', 'name': 'El Turco Hassan', 'meta': '18 TEMPORADAS DETRÁS DE LA BARRA',
+     'text': 'Dicen que el Turco servía un vaso por segundo en la terraza de Playa Central y que conocía el trago favorito de cada habitué. La barra era el corazón de la noche, repite hasta hoy.',
+     'quote': 'La barra era el corazón de la noche.', 'source': '🟡 HISTORIA QUE SE CUENTA'},
+    {'role': 'LOCUTOR · PLAYA 86', 'name': 'El Negro Aguirre', 'meta': 'LA VOZ DE LA RADIO EN LA PLAYA',
+     'text': 'En el verano del 86 puso la voz a la radio al aire libre que el grupo de amigos armó en la Playa de Ban Zai. Los que estuvieron dicen que su saludo se escuchaba hasta del otro lado del río.',
+     'quote': '¡Buenas tardes, Mina Clavero!', 'source': '🟡 HISTORIA QUE SE CUENTA'},
+    {'role': 'FOTÓGRAFA · AÑOS 90', 'name': 'Marta Gutiérrez', 'meta': 'RETRATÓ LOS VERANOS DEL 90 AL 98',
+     'text': 'Recorría la pista con una camarita de flash cuadrado vendiendo fotos a dos pesos. Miles de cordobeses tienen todavía su foto en una billetera o un álbum familiar. El archivo quiere encontrarlas.',
+     'quote': 'Cada foto era un pedacito de noche que la gente se llevaba a casa.', 'source': '🟡 EN BÚSQUEDA DE SUS FOTOS'},
+]
 
 def _parse_name(filename):
     """'1992 - La Conga - Quique.mp3' -> ('La Conga', '1992', 'Quique')"""
@@ -55,6 +79,10 @@ def run_seed():
                                         sede='ambas', year=year, filename=f,
                                         source_type='file', status='aprobado'))
                 added += 1
+
+    for p in PROTAGONISTAS:
+        if not Protagonista.query.filter_by(name=p['name']).first():
+            db.session.add(Protagonista(**p))
 
     db.session.commit()
     print(f'>>> Seed: {added} elementos nuevos cargados')

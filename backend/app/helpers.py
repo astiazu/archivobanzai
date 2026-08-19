@@ -27,10 +27,13 @@ def admin_required(f):
         return f(*a, **k)
     return w
 
-def guardar_file(f, carpeta, exts):
-    if not f or not f.filename or '.' not in f.filename: return None
+def guardar_file(f, carpeta, allowed):
+    if not f or not f.filename:
+        return None
+    os.makedirs(os.path.join(Config.UPLOAD_DIR, carpeta), exist_ok=True)
     ext = f.filename.rsplit('.', 1)[-1].lower()
-    if ext not in exts: return None
-    name = f"{secrets.token_hex(6)}.{ext}"
+    if ext not in allowed:
+        return None
+    name = secrets.token_hex(6) + '.' + ext
     f.save(os.path.join(Config.UPLOAD_DIR, carpeta, name))
     return name

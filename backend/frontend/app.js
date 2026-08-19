@@ -532,5 +532,103 @@ fetch(API + '/api/stats').then(r => r.json()).then(d => {
 }).catch(() => {});
 setInterval(sendHeartbeat, 15000);
 
+/* ============ CARRUSEL PROTAGONISTAS ============ */
+(async function(){
+  const track = document.getElementById('protTrack');
+  if (!track) return;
+  const r = await fetch(API + '/api/protagonistas');
+  const protas = await r.json();
+  track.innerHTML = protas.map(p => `
+    <div class="card-protagonista" data-id="${p.id}">
+      <div class="role">${p.role}</div>
+      <h3>${p.name}</h3>
+      <div class="meta">${p.meta}</div>
+      <div class="quote">"${p.quote}"</div>
+      <span class="ver-mas">Ver historia completa →</span>
+    </div>`).join('');
+
+  const dialog = document.getElementById('protDialog');
+  track.addEventListener('click', e => {
+    e.preventDefault();
+    const card = e.target.closest('.card-protagonista');
+    if (!card) return;
+    const p = protas.find(x => x.id == card.dataset.id);
+    if (!p) return;
+    document.getElementById('protRole').textContent = p.role;
+    document.getElementById('protName').textContent = p.name;
+    document.getElementById('protMeta').textContent = p.meta;
+    document.getElementById('protText').textContent = p.text;
+    document.getElementById('protQuote').textContent = '"' + p.quote + '"';
+    document.getElementById('protSource').textContent = p.source;
+
+    const media = document.getElementById('protMedia');
+    let mh = '';
+    if (p.media_type === 'foto' && p.media_file)
+      mh = '<img src="/uploads/protagonistas/' + p.media_file + '" style="width:100%;border:1px solid #222230">';
+    else if (p.media_type === 'video' && p.media_file)
+      mh = '<video controls src="/uploads/protagonistas/' + p.media_file + '" style="width:100%"></video>';
+    else if (p.media_type === 'video' && p.media_url)
+      mh = '<iframe width="100%" height="300" src="https://www.youtube.com/embed/' + (p.media_url.match(/(?:v=|youtu\.be\/)([\w-]{11})/) || [,''])[1] + '" frameborder="0" allowfullscreen></iframe>';
+    else if (p.media_type === 'audio' && p.media_file)
+      mh = '<audio controls src="/uploads/protagonistas/' + p.media_file + '" style="width:100%"></audio>';
+    media.innerHTML = mh;
+    const y = window.scrollY;
+    dialog.showModal();
+    window.scrollTo(0, y);
+  });
+  document.getElementById('closeProtDialog').onclick = () => {
+  dialog.close();
+  window.scrollTo(0, window.scrollY);
+  };
+
+  const prev = document.getElementById('protPrev');
+  const next = document.getElementById('protNext');
+  const visibles = () => innerWidth <= 600 ? 1 : innerWidth <= 900 ? 2 : 4;
+  const paso = () => (track.querySelector('.card-protagonista').offsetWidth + 16) * visibles();
+  prev.onclick = () => track.scrollBy({left: -paso(), behavior: 'smooth'});
+  next.onclick = () => track.scrollBy({left: paso(), behavior: 'smooth'});
+  const flechas = () => {
+    prev.disabled = track.scrollLeft <= 0;
+    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 5;
+  };
+  track.addEventListener('scroll', flechas);
+  flechas();
+})();
+
+/* ============ APORTE DE PROTAGONISTAS (comunidad) ============ */
+const btnProta = document.getElementById('btnProta');
+const protaDialog = document.getElementById('protaFormDialog');
+if (btnProta) btnProta.addEventListener('click', () => {
+  if (!window.BZ || !window.BZ.logged_in) {
+    showGate('Para contar tu historia primero sumate a la comunidad.');
+    return;
+  }
+  const y = window.scrollY;
+  protaDialog.showModal();
+  window.scrollTo(0, y);
+});
+document.getElementById('closeProtaForm').onclick = () => protaDialog.close();
+
+const protaForm = document.getElementById('protaForm');
+if (protaForm) protaForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = document.getElementById('protaMsg');
+  msg.textContent = 'Enviando…';
+  const fd = new FormData(protaForm);
+  try {
+    const r = await fetch(API + '/api/protagonistas', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.ok) {
+      msg.textContent = '✓ ¡Gracias! Tu ficha entró a moderación.';
+      protaForm.reset();
+      setTimeout(() => protaDialog.close(), 2500);
+    } else {
+      msg.textContent = '⚠️ ' + (d.error || 'No se pudo enviar.');
+    }
+  } catch (err) {
+    msg.textContent = '⚠️ Error de conexión.';
+  }
+});
+
 /* ============ ARRANQUE ============ */
 initTimeline();

@@ -77,6 +77,20 @@ class Listener(db.Model):
     track_id = db.Column(db.Integer)
     last_ping = db.Column(db.DateTime, default=now_utc, index=True)
 
+class Protagonista(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role = db.Column(db.String(60))
+    name = db.Column(db.String(120), nullable=False)
+    meta = db.Column(db.String(120))
+    text = db.Column(db.Text)
+    quote = db.Column(db.String(300))
+    source = db.Column(db.String(120))
+    status = db.Column(db.String(10), default='aprobado')
+    created_at = db.Column(db.DateTime, default=now_utc)
+    media_type = db.Column(db.String(10))
+    media_file = db.Column(db.String(200))
+    media_url = db.Column(db.String(300))
+    
 # ---------------------
 
 

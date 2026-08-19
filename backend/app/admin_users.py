@@ -1,8 +1,8 @@
 # archivobanzai\backend\app\admin_user.py
 import secrets
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from .models import db, User, Vote, Track, Recuerdo, Playlist
-from .helpers import current_user
+from .models import db, User, Vote, Track, Recuerdo, Playlist, Protagonista
+from .helpers import current_user, guardar_file
 from .routes_auth import enviar_mail_verificacion
 
 bp = Blueprint('admin_users', __name__)
@@ -18,7 +18,8 @@ def usuarios():
         flash('Solo el administrador puede gestionar usuarios.')
         return redirect(url_for('auth.login'))
     usuarios = User.query.order_by(User.created_at.desc()).all()
-    return render_template('admin_users.html', usuarios=usuarios, admin=admin)
+    protas_pend = Protagonista.query.filter_by(status='pendiente').order_by(Protagonista.id).all()
+    return render_template('admin_users.html', usuarios=usuarios, admin=admin, protas_pend=protas_pend)
 
 @bp.route('/admin/usuarios/<int:uid>/editar', methods=['POST'])
 def editar(uid):
@@ -114,3 +115,57 @@ def eliminar(uid):
         flash(f'Usuario {nombre} eliminado. Su contenido pasó al admin para no perder el archivo.')
     return redirect(url_for('admin_users.usuarios'))
 
+@bp.route('/admin/protagonistas/nuevo', methods=['POST'])
+def nuevo_protagonista():
+    admin = _admin()
+    if not admin:
+        return redirect(url_for('auth.login'))
+
+    media_file, media_type = None, ''
+    media_url = (request.form.get('media_url') or '').strip()
+    f = request.files.get('media')
+
+    if f and f.filename:
+        ext = f.filename.rsplit('.', 1)[-1].lower()
+        if ext in ('jpg', 'jpeg', 'png', 'webp', 'gif'):
+            media_type = 'foto'
+        elif ext in ('mp4', 'mov', 'webm'):
+            media_type = 'video'
+        elif ext in ('mp3', 'wav', 'm4a', 'ogg'):
+            media_type = 'audio'
+        media_file = guardar_file(f, 'protagonistas',
+                                  ('jpg', 'jpeg', 'png', 'webp', 'gif',
+                                   'mp4', 'mov', 'webm', 'mp3', 'wav', 'm4a', 'ogg'))
+    elif media_url.startswith('http'):
+        media_type = 'video'
+
+    db.session.add(Protagonista(
+        role=(request.form.get('role') or '').strip(),
+        name=(request.form.get('name') or '').strip(),
+        meta=(request.form.get('meta') or '').strip(),
+        text=(request.form.get('text') or '').strip(),
+        quote=(request.form.get('quote') or '').strip(),
+        source=(request.form.get('source') or '').strip(),
+        media_type=media_type, media_file=media_file, media_url=media_url,
+        status='aprobado'))
+    db.session.commit()
+    flash('Protagonista cargado.')
+    return redirect(url_for('admin_users.usuarios'))
+
+@bp.route('/admin/protagonistas/<int:pid>/<accion>', methods=['POST'])
+def protagonista_accion(pid, accion):
+    admin = _admin()
+    if not admin: return redirect(url_for('auth.login'))
+    p = db.session.get(Protagonista, pid)
+    if not p: return redirect(url_for('admin_users.usuarios'))
+    if accion == 'aprobar':
+        p.status = 'aprobado'
+        flash(f'Protagonista {p.name} aprobado y publicado.')
+    elif accion == 'rechazar':
+        p.status = 'rechazado'
+        flash(f'Protagonista {p.name} rechazado.')
+    elif accion == 'eliminar':
+        db.session.delete(p)
+        flash(f'Protagonista {p.name} eliminado.')
+    db.session.commit()
+    return redirect(url_for('admin_users.usuarios'))

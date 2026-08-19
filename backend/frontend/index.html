@@ -173,45 +173,56 @@
     </section>
 
     <!-- PROTAGONISTAS -->
-    <section class="protagonistas section" id="protagonistas">
-      <div class="section-label">04 / PROTAGONISTAS</div>
-      <h2>Las personas que<br><span>hicieron la leyenda.</span></h2>
-      <p class="section-intro">Ban Zai no fue solamente un lugar. Fue la gente que lo hizo inolvidable: DJs, locutores, mozos, barmans, fotógrafos, organizadores y la gente que lo llenaba cada noche.</p>
-      <div class="prot-grid">
-        <article class="prot-card">
-          <span class="prot-role">DJ · SALDÁN</span>
-          <h3>Eduardo Quintana</h3>
-          <p class="prot-meta">BARRIO PUEYRREDÓN · HOY EN ALEMANIA</p>
-          <p>Trabajó como DJ en Ban Zai Saldán. Hoy regentea un restaurante en Alemania, pero recuerda con cariño sus inicios en la disco mítica de Av. Latinoamérica.</p>
-          <div class="quote-small">"Hacía divertir mucho a la gente."</div>
-          <span class="prot-src">FUENTE · Cadena 3 ↗</span>
-        </article>
-        <article class="prot-card">
-          <span class="prot-role">RADIO · MINA CLAVERO</span>
-          <h3>FM 104.9 Rockhola</h3>
-          <p class="prot-meta">GRUPO FUNDADOR · DESDE 1986</p>
-          <p>El mismo grupo que en 1986 hacía locución en la Playa de Ban Zai y armó una radio al aire libre, hoy sostiene FM 104.9 Rockhola y Radio Portneuf Club.</p>
-          <div class="quote-small">"Disfrutando de la magia de la música, de los grandes locutores, nos volvimos adictos a la buena música."</div>
-          <span class="prot-src">FUENTE · App Rockhola ↗</span>
-        </article>
-        <article class="prot-card">
-          <span class="prot-role">DUEÑO · HOY</span>
-          <h3>Quique</h3>
-          <p class="prot-meta">BAN ZAI SHOW · REAPERTURA 2026</p>
-          <p>Detrás del regreso de Ban Zai Mina Clavero en septiembre de 2026. Lidera Ban Zai Show y la reconstrucción de la marca como archivo vivo de la noche cordobesa.</p>
-          <div class="quote-small">Pronto, un testimonio del propio Quique sobre cómo empezó este regreso.</div>
-          <span class="prot-src badge warn">🟡 TESTIMONIO EN CURSO</span>
-        </article>
-        <article class="prot-card">
-          <span class="prot-role">LA GENTE</span>
-          <h3>Vos, que estuviste ahí</h3>
-          <p class="prot-meta">CADA NOCHE · CADA VERANO</p>
-          <p>Esta ficha queda vacía a propósito. Porque el archivo se completa con cada foto, cada testimonio, cada recuerdo que nos mandes.</p>
-          <div class="quote-small">"¿Estuviste vos? Entonces tu lugar en el archivo está esperándote."</div>
-          <a class="prot-src" href="#participa">SUMAR MI RECUERDO →</a>
-        </article>
+    <section id="protagonistas" class="section">
+      <span class="section-label">04 / PROTAGONISTAS</span>
+      <h2>Las voces del archivo.</h2>
+      <p class="muted">DJ, locutores, barmans, fotógrafos y la gente. Cada ficha es un pedazo de la noche que queremos recuperar.</p>
+      
+      <div class="carousel-container">
+        <button class="carousel-arrow carousel-prev" id="protPrev" aria-label="Anterior">‹</button>
+        <div class="carousel-track" id="protTrack"></div>
+        <button class="carousel-arrow carousel-next" id="protNext" aria-label="Siguiente">›</button>
       </div>
     </section>
+    <p style="margin-top:24px">
+      <button class="btn btn-primary" id="btnProta">YO ESTUVE AHÍ · CONTAR MI HISTORIA</button>
+    </p>
+
+    <dialog id="protaFormDialog">
+      <button class="dialog-close" id="closeProtaForm" aria-label="Cerrar">×</button>
+      <span class="section-label">TU FICHA EN EL ARCHIVO</span>
+      <h2>Contá tu historia.</h2>
+      <p class="muted">Tu aporte pasa por moderación del equipo antes de publicarse.</p>
+      <form id="protaForm">
+        <label>Tu nombre o apodo *</label>
+        <input name="name" required placeholder="¿Cómo te llamaban?">
+        <label>Rol / sección</label>
+        <input name="role" placeholder="Ej.: GENTE DE LA PISTA · AÑOS 90">
+        <label>Meta (línea chica)</label>
+        <input name="meta" placeholder="Ej.: VERANO DEL 92 · MINA CLAVERO">
+        <label>Tu historia</label>
+        <textarea name="text" rows="4" placeholder="¿Qué recordás de esas noches?"></textarea>
+        <label>Frase tuya (cita)</label>
+        <input name="quote" placeholder="Una frase que te represente">
+        <label>Registro fotográfico (foto / video / audio)</label>
+        <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.mp3,.wav,.m4a,.ogg">
+        <label>…o URL de YouTube</label>
+        <input name="media_url" placeholder="https://youtube.com/watch?v=...">
+        <button class="btn btn-primary" type="submit">ENVIAR A MODERACIÓN</button>
+        <p id="protaMsg" class="dialog-message"></p>
+      </form>
+    </dialog>
+
+    <dialog id="protDialog">
+      <button class="dialog-close" id="closeProtDialog" aria-label="Cerrar">×</button>
+      <span class="section-label" id="protRole"></span>
+      <h2 id="protName"></h2>
+      <p class="muted" id="protMeta"></p>
+      <div id="protMedia" style="margin:16px 0"></div>
+      <p id="protText" style="margin:20px 0"></p>
+      <blockquote id="protQuote" style="border-left:3px solid #d4af37; padding-left:16px; margin:20px 0; font-style:italic; color:#d4af37"></blockquote>
+      <p class="muted" id="protSource" style="font-size:12px"></p>
+    </dialog>
 
     <!-- MAPA HISTÓRICO -->
     <section class="mapa section" id="mapa">
