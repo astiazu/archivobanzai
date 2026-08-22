@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import json
 from .models import db, User, Track, Recuerdo, Protagonista
 from .config import Config
 
@@ -38,6 +39,43 @@ def _parse_name(filename):
         extra = resto[1].strip() if len(resto) > 1 else ''
         return title, m.group(1), extra
     return base, '', ''
+
+def seed_protagonistas_folder():
+    """Carga seed/protagonistas/: pares Nombre.json + Nombre.(jpg|mp3|mp4)."""
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    carpeta = os.path.join(root, 'seed', 'protagonistas')
+    if not os.path.isdir(carpeta):
+        return 0
+    exts = ('jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'm4a', 'ogg')
+    added = 0
+    for f in sorted(os.listdir(carpeta)):
+        if not f.lower().endswith('.json'):
+            continue
+        base = os.path.splitext(f)[0]
+        with open(os.path.join(carpeta, f), encoding='utf-8') as fh:
+            data = json.load(fh)
+        name = data.get('name', base)
+        if Protagonista.query.filter_by(name=name).first():
+            continue
+        media_file, media_type = None, ''
+        for ext in exts:
+            cand = os.path.join(carpeta, base + '.' + ext)
+            if os.path.exists(cand):
+                dest = os.path.join(Config.UPLOAD_DIR, 'protagonistas', base + '.' + ext)
+                os.makedirs(os.path.dirname(dest), exist_ok=True)
+                if not os.path.exists(dest):
+                    shutil.copy2(cand, dest)
+                media_file = base + '.' + ext
+                media_type = 'foto' if ext in ('jpg', 'jpeg', 'png', 'webp', 'gif') else 'video' if ext in ('mp4', 'mov', 'webm') else 'audio'
+                break
+        db.session.add(Protagonista(
+            role=data.get('role', ''), name=name, meta=data.get('meta', ''),
+            text=data.get('text', ''), quote=data.get('quote', ''),
+            source=data.get('source', ''), media_type=media_type,
+            media_file=media_file, media_url=data.get('media_url', ''),
+            status='aprobado'))
+        added += 1
+    return added
 
 def run_seed():
     """Carga seed/radio y seed/fotos al sitio. Idempotente: no duplica."""
@@ -83,6 +121,8 @@ def run_seed():
     for p in PROTAGONISTAS:
         if not Protagonista.query.filter_by(name=p['name']).first():
             db.session.add(Protagonista(**p))
+
+    added += seed_protagonistas_folder()
 
     db.session.commit()
     print(f'>>> Seed: {added} elementos nuevos cargados')
